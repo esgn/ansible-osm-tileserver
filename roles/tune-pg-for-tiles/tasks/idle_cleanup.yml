@@ -1,0 +1,17 @@
+---
+
+- name: Copy sql cleanup script
+  ansible.builtin.template:
+    src: templates/idle-cleanup.sql.j2
+    dest: "{{ scripts_dir }}/idle-cleanup.sql"
+    owner: "{{ renderd_user }}"
+    group: "{{ renderd_user }}"
+    mode: u=rw,g=r,o=r
+  become: true
+
+- name: Set up cron job for cleaning up db idle queries
+  ansible.builtin.cron:
+    name: "cleanup idle postgresql queries older than 5 minutes"
+    minute: "*/{{ pg_cleanup_interval }}"
+    job: "sudo -u _renderd psql -d {{ db_name }} -f {{ scripts_dir }}/idle-cleanup.sql"
+  become: true

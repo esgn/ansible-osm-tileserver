@@ -1,0 +1,27 @@
+---
+
+- name: Get letsencrypt certificate
+  ansible.builtin.shell:
+    cmd: "certbot certonly --non-interactive --agree-tos -m {{ letsencrypt_mail }} --webroot -w {{ html_dir }} -d {{ service_domain }}"
+  become: true
+
+- name: Deploy https virtual host
+  ansible.builtin.template:
+    src: "templates/apache2.https.default.j2"
+    dest: "/etc/apache2/sites-available/https.conf"
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+
+- name: Activate https site
+  ansible.builtin.shell:
+    cmd: a2ensite https
+  become: true
+
+- name: Activate http to https redirection
+  ansible.builtin.replace:
+    path: "/etc/apache2/sites-available/http.conf"
+    regexp: '##'
+    replace: ''
+  become: true

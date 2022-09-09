@@ -1,0 +1,32 @@
+---
+
+- name: Set facts
+  ansible.builtin.set_fact:
+    cache_size: "{{ ansible_memtotal_mb * 10 * 0.7 }}"
+    pbf_file: "{{ osmdata_dir }}/osm.pbf"
+    log_file: "{{ setup_logs_dir }}/import.log"
+    style_file: "{{ osmcarto_dir }}/openstreetmap-carto.style"
+    transform_script: "{{ osmcarto_dir }}/openstreetmap-carto.lua"
+
+- name: Launch import as asynchronous task without flat nodes
+  ansible.builtin.shell:
+    cmd: sudo -u {{ renderd_user }} osm2pgsql --slim --hstore --multi-geometry --database={{ db_name }} --cache={{ cache_size }} --number-processes={{ import_num_threads }} --style={{ style_file }} --tag-transform-script={{ transform_script }} {{ pbf_file }} 2>&1 | sudo -u {{ renderd_user }} tee {{ log_file }}
+  async: 86400
+  poll: 60
+  register: cmd_result
+  become: true
+  when: flat_nodes|bool == False
+
+- name: Launch import as asynchronous task with flat nodes
+  ansible.builtin.shell:
+    cmd: sudo -u {{ renderd_user }} osm2pgsql --slim --hstore --multi-geometry --database={{ db_name }} --cache={{ cache_size }} --flat-nodes={{ osmdata_dir }}/flat_nodes --number-processes={{ import_num_threads }} --style={{ style_file }} --tag-transform-script={{ transform_script }} {{ pbf_file }} 2>&1 | sudo -u {{ renderd_user }} tee {{ log_file }}
+  async: 86400
+  poll: 60
+  register: cmd_result
+  become: true
+  when: flat_nodes|bool == True
+
+- name: Print import command result
+  debug:
+    msg: "{{ cmd_result }}"
+  

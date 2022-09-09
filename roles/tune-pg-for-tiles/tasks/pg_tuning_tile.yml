@@ -1,0 +1,32 @@
+---
+
+- name: Tune PostgreSQL for tiles production
+  community.postgresql.postgresql_set:
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+  register: update
+  become: true
+  become_user: postgres
+  loop:
+    - { name: 'max_connections', value: "{{ tile_max_connections }}" }
+    - { name: 'shared_buffers', value: "{{ tile_shared_buffers }}" }
+    - { name: 'effective_cache_size', value: "{{ tile_effective_cache_size }}" }
+    - { name: 'maintenance_work_mem', value: "{{ tile_maintenance_work_mem }}" }
+    - { name: 'checkpoint_completion_target', value: "{{ tile_checkpoint_completion_target }}" }
+    - { name: 'wal_buffers', value: "{{ tile_wal_buffers }}" }
+    - { name: 'default_statistics_target', value: "{{ tile_default_statistics_target }}" }
+    - { name: 'random_page_cost', value: "{{ tile_random_page_cost }}" }
+    - { name: 'effective_io_concurrency', value: "{{ tile_effective_io_concurrency }}" }
+    - { name: 'work_mem', value: "{{ tile_work_mem }}" }
+    - { name: 'min_wal_size', value: "{{ tile_min_wal_size }}" }
+    - { name: 'max_wal_size', value: "{{ tile_max_wal_size }}" }
+    - { name: 'max_worker_processes', value: "{{ tile_max_worker_processes }}" }
+    - { name: 'max_parallel_workers_per_gather', value: "{{ tile_max_parallel_workers_per_gather }}" }
+    - { name: 'max_parallel_workers', value: "{{ tile_max_parallel_workers }}" }
+    - { name: 'max_parallel_maintenance_workers', value: "{{ tile_max_parallel_maintenance_workers }}" }
+    - { name: 'jit', value: "{{ tile_jit }}" }
+
+- name: Print the result if the setting changed
+  ansible.builtin.debug:
+    msg: "{{ item.name }} {{ item.prev_val_pretty }} >> {{ item.value_pretty }} restart_req: {{ item.restart_required }}"
+  loop: "{{ update.results }}"

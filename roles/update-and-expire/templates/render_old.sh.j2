@@ -1,0 +1,29 @@
+#!/bin/bash
+
+echo
+echo "render_old.sh run started :" `date`
+
+# check if update_db is already running
+while [ -f {{ update_lock_file }} ]
+do
+    sleep 15
+    echo "waiting for update_db.sh to finish"
+done
+
+# Check it this script is already running
+if [[ -f {{ render_old_lock_file }} ]]
+then
+    echo "render_old.sh is already running. Exiting."
+    exit 1
+else
+    touch {{ render_old_lock_file }}
+fi
+
+if ! render_old -c /etc/renderd.conf -n {{ render_old_num_threads }} -t {{ tiles_dir }} -z {{ render_old_min_zoom }} -Z {{ render_old_max_zoom }} -s {{ renderd_sock_path }} -l {{ ansible_processor_nproc }} -T "$(date +%d/%m/%y -d '19 years ago')" -m {{ layer_name }} > {{ logs_dir }}/render-old/render_old.$$ 2>&1
+then
+        echo "render_old error !"
+fi
+
+rm {{ render_old_lock_file }}
+
+echo "render_old.sh run finished :" `date` 

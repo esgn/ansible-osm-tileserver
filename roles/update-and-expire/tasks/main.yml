@@ -1,0 +1,16 @@
+---
+
+- name: Install Python 3 necessary packages
+  include_tasks: python3_pkg.yml
+
+- name: Deploy scripts
+  include_tasks: deploy_scripts.yml
+
+- name: Init database for osm2pgsql-replication
+  include_tasks: init_replication.yml
+
+- name: Setup update jobs in cron
+  include_tasks: cron_jobs.yml
+
+- name: Update renderd configuration
+  include_tasks: renderd_conf.yml

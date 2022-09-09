@@ -1,0 +1,7 @@
+---
+
+- name: Activate slow queries logging
+  ansible.builtin.shell:
+    cmd: psql -d {{ db_name }} -c "ALTER DATABASE {{ db_name }} SET log_min_duration_statement = {{ min_duration }};"
+  become: true
+  become_user: postgres

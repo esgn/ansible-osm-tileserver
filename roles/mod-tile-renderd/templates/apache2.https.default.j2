@@ -1,0 +1,53 @@
+ <IfModule mod_ssl.c>
+    <VirtualHost *:443>
+
+        # Basic server configuration
+        ServerName {{ service_domain }}
+        ServerAdmin webmaster@{{ service_domain }}
+
+        # Setup logging
+        LogLevel warn
+        LogFormat "%a %l %u %t \"%r\" %>s %O \"%{Referer}i\" \"%{User-Agent}i\"" combined_with_remoteip
+        CustomLog /var/log/apache2/https-access.log combined_with_remoteip
+        ErrorLog /var/log/apache2/https-error.log
+        BufferedLogs on
+
+        # Enable SSL
+        SSLEngine on
+        SSLProxyEngine on
+        SSLCertificateFile /etc/letsencrypt/live/{{ service_domain }}/fullchain.pem
+        SSLCertificateKeyFile /etc/letsencrypt/live/{{ service_domain }}/privkey.pem
+
+        # Always set Access-Control-Allow-Origin so that simple CORS requests
+        # will always work and can be cached
+        Header set Access-Control-Allow-Origin "*"
+
+        # Remove Proxy request header to mitigate https://httpoxy.org/
+        RequestHeader unset Proxy early
+
+        # Enable the rewrite engine
+        RewriteEngine on
+
+        # Configure location of static files and CGI scripts
+        DocumentRoot {{ html_dir }}
+
+        # Tell clients to use stale tiles if necessary
+        # https://www.fastly.com/blog/stale-while-revalidate-stale-if-error-available-today
+        Header append Cache-Control "stale-while-revalidate=604800, stale-if-error=604800" "expr=%{CONTENT_TYPE} == 'image/png'"
+
+        <Directory {{ html_dir }}>
+            Options None
+            AllowOverride None
+            Require all granted
+        </Directory>
+
+        # Referer filtering
+        <Location /{{ layer_name }}>
+            SetEnvIf Referer {{ service_domain }} trusted_referer
+            Order deny,allow
+            Deny from all
+            Allow from env=trusted_referer
+        </Location>
+
+    </VirtualHost>
+</IfModule>

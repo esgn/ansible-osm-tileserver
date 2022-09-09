@@ -1,0 +1,22 @@
+---
+
+- name: Log slow queries 
+  include_tasks: slow_queries.yml
+
+- name: Tune postgresql for tile production
+  include_tasks: pg_tuning_tile.yml
+
+- name: Set up idle query automatic cleanup
+  include_tasks: idle_cleanup.yml
+
+- name: Restart PostgreSQL
+  ansible.builtin.service:
+    name: postgresql
+    state: restarted
+  become: true
+
+- name: Restart renderd
+  ansible.builtin.service:
+    name: renderd
+    state: restarted
+  become: true

@@ -1,0 +1,7 @@
+---
+
+- name: Install postgis
+  include_tasks: install_postgis.yml
+
+- name: Create gis database
+  include_tasks: create_db.yml

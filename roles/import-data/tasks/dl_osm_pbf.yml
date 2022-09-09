@@ -1,0 +1,14 @@
+---
+
+- name: Download OSM pbf dataset
+  ansible.builtin.get_url:
+    url: "{{ osm_pbf_url }}"
+    dest: "{{ osmdata_dir }}/osm.pbf"
+    timeout: 30
+  register: get_url_result
+  become: true
+  become_user: "{{ renderd_user }}"
+
+- name: Print get_url result
+  debug:
+    msg: "{{ get_url_result }}"

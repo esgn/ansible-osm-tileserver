@@ -1,0 +1,16 @@
+---
+
+- name: Deploy scripts
+  ansible.builtin.template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "{{ renderd_user }}"
+    group: "{{ renderd_user }}"
+    mode: '0755'
+  loop:
+    - { src: 'templates/expire_tiles.sh.j2', dest: '{{ scripts_dir }}/expire_tiles.sh' }
+    - { src: 'templates/update_db.sh.j2', dest: '{{ scripts_dir }}/update_db.sh' }
+    - { src: 'templates/render_old.sh.j2', dest: '{{ scripts_dir }}/render_old.sh' }
+    - { src: 'templates/periodic_report.sh.j2', dest: '{{ scripts_dir }}/periodic_report.sh' }
+    - { src: 'templates/report.html.j2', dest: '{{ html_dir }}/report.html.template' }
+  become: true

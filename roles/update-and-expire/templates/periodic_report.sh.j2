@@ -1,0 +1,109 @@
+#!/bin/bash
+
+# pretty print timestamp
+function display_time {
+    local T=$1
+    local D=$((T/60/60/24))
+    local H=$((T/60/60%24))
+    local M=$((T/60%60))
+    local S=$((T%60))
+    (( $D > 0 )) && printf '%d days ' $D
+    (( $H > 0 )) && printf '%d hours ' $H
+    (( $M > 0 )) && printf '%d minutes ' $M
+    (( $D > 0 || $H > 0 || $M > 0 )) && printf 'and '
+    printf '%d seconds\n' $S
+}
+
+# pretty print large number
+function print_large_number {
+    printf "%'d\n" $1
+}
+
+# get file age (now - mtime) in seconds
+function get_file_age {
+    sec=$(( $(date +%s) - $(stat -c%Y $1) ))
+    echo $sec
+}
+
+# get file duration (mtime - birth) in seconds
+function get_file_duration {
+    em_time=$(stat -c%Y $1)
+    eb_time=$(stat -c%W $1)
+    time_taken=$(( em_time - eb_time ))
+    echo $time_taken
+}
+
+# get last modified file in dir 
+function get_latest_file_in_dir {
+    if [[ "$(ls -A $1)" ]]
+    then
+        newest=$(ls -dArt $1/* | tail -n 1)
+    else
+        newest=""
+    fi
+    echo $newest
+}
+
+# get process status
+# param 1 : process lock file
+# param 2 : process logs dir
+# param 3 : process name
+function get_process_status {
+    # check if process is running
+    if [[ -f  "$1" ]]
+    then
+	    # get running time from process lock file
+        lock_file_age=$( get_file_age $1 )
+	    process_status="$3 is running since $( display_time $lock_file_age )"
+    else
+	    # if process is not running get last duration from log file
+        latest_log_file=$( get_latest_file_in_dir $2 )
+        if [[ ! -z "$latest_log_file" ]]
+	    then
+	        log_file_duration=$( get_file_duration $latest_log_file )
+	        process_status="$3 is not running for the moment. last run took $( display_time $log_file_duration )"
+	    else
+            process_status="$3 is not running for the moment. could not determine last run duration from log files"  
+	    fi
+    fi
+    echo $process_status
+}
+
+# define variables
+render_old_lock_file={{ render_old_lock_file }}
+update_lock_file={{ update_lock_file }}
+render_old_logs_dir={{ render_old_logs_dir }}
+update_logs_dir={{ update_logs_dir }}
+template_file=report.html.template
+tmp_file=report.html.tmp
+report_file=report.html
+fd_num_threads=8
+start=$(date +%s)
+
+# launch find commands in parallel ...
+cd {{ tiles_dir }}/{{ layer_name }} 
+fdfind --extension meta --threads $fd_num_threads --type f | wc -l > meta &
+fdfind --extension meta --change-older-than '19 years' --threads $fd_num_threads --type f | wc -l > expmeta &
+# ... and wait for them to finish
+wait
+
+# load variables
+meta=$(print_large_number $(cat meta))
+expmeta=$(print_large_number $(cat expmeta))
+rm meta
+rm expmeta
+update_status=$( get_process_status "$update_lock_file" "$update_logs_dir" "update_db" )
+render_old_status=$( get_process_status "$render_old_lock_file" "$render_old_logs_dir" "render_old" )
+end=$(date +%s)
+production_time="produced on $( date ) in  $(( $end - $start )) seconds"
+
+# produce report
+cd {{ html_dir }}
+cp $template_file $tmp_file
+sed -i "s/META_NUM/$meta/" $tmp_file
+sed -i "s/DIRTY_NUM/$expmeta/" $tmp_file
+sed -i "s/RENDER_OLD_STATUS/$render_old_status/" $tmp_file
+sed -i "s/UPDATE_STATUS/$update_status/" $tmp_file
+sed -i "s/PRODUCTION_TIME/$production_time/" $tmp_file
+mv $tmp_file $report_file
+chmod 644 $report_file

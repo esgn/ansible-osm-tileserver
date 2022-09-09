@@ -1,0 +1,19 @@
+---
+
+- name: Install useful packages
+  ansible.builtin.apt:
+    pkg:
+    - curl
+    - ca-certificates
+    - gnupg
+    - git
+    - unzip
+    - vim
+    - fd-find
+  become: true
+
+- name: Installing the renderd package at this stage so that _renderd user is available from the start
+  ansible.builtin.apt:
+    pkg: renderd
+    install_recommends: no
+  become: true

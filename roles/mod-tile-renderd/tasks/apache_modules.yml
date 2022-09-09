@@ -1,0 +1,14 @@
+---
+
+- name: Enable the Apache2 headers module
+  community.general.apache2_module:
+    state: present
+    name: "{{ item }}"
+  loop:
+    - headers
+    - rewrite
+    - tile
+    - qos
+    - ssl
+    - headers
+  become: true

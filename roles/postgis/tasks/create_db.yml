@@ -1,0 +1,25 @@
+---
+
+- name: Create a new database user with name "{{ renderd_user }}""
+  community.postgresql.postgresql_user:
+    name: "{{ renderd_user }}"
+  become: true
+  become_user: postgres
+
+- name: Create a new database with name "{{ db_name }}" owned by "{{ renderd_user }}""
+  community.postgresql.postgresql_db:
+    name: "{{ db_name }}"
+    encoding: UTF-8
+    owner: "{{ renderd_user }}"
+  become: true
+  become_user: postgres
+
+- name: Adds postgis and hstore extensions to the database "{{ db_name }}"
+  community.postgresql.postgresql_ext:
+    name: "{{ item }}" 
+    db: "{{ db_name }}"
+  become: true
+  become_user: postgres
+  loop:
+    - postgis
+    - hstore

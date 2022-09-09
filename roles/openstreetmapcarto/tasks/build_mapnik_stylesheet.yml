@@ -1,0 +1,32 @@
+---
+
+- name: Install standard packages
+  ansible.builtin.apt:
+    pkg:
+    - python3-psycopg2
+    - python3-yaml
+    - python3-requests
+    - nodejs
+    - npm
+    - curl
+    - gdal-bin
+    - mapnik-utils
+    # - libmapnik-dev
+  become: true
+
+- name: Install carto CSS using npm
+  community.general.npm:
+    name: carto
+    global: yes
+    state: present
+  become: true
+  
+# Warning at this stage are considered non-issue for the time being
+# https://github.com/gravitystorm/openstreetmap-carto/issues/3717
+# https://github.com/gravitystorm/openstreetmap-carto/issues/3183
+- name: Generate mapnik stylesheet for OSM carto
+  ansible.builtin.shell:
+    cmd: "carto -a 3.0.22 project.mml > style.xml"
+    chdir: "{{ osmcarto_dir }}"
+  become: true
+  become_user: "{{ renderd_user }}"

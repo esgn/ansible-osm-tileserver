@@ -1,0 +1,8 @@
+---
+
+- name: Create OpenStreetMap Carto indexes
+  ansible.builtin.command:
+    cmd: "psql -d gis -f indexes.sql --echo-queries -L {{ setup_logs_dir }}/indexes.log"
+    chdir: "{{ osmcarto_dir }}"
+  become: true
+  become_user: "{{ renderd_user }}"

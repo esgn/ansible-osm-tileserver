@@ -1,0 +1,7 @@
+---
+
+- name: Init database for update
+  ansible.builtin.shell:
+    cmd: "osm2pgsql-replication init -d {{ db_name }}"
+  become: true
+  become_user: "{{ renderd_user }}"

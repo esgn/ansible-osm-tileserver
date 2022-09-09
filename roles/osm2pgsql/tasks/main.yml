@@ -1,0 +1,8 @@
+---
+
+- name: Install osm2pgsql from {{ ansible_distribution_release }}-backports
+  ansible.builtin.apt:
+    pkg:
+    - osm2pgsql
+    default_release: "{{ ansible_distribution_release }}-backports"
+  become: true

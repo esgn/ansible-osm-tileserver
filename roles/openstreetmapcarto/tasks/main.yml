@@ -1,0 +1,14 @@
+---
+
+- name: Download OSM Carto style
+  include_tasks: dl_osmcarto.yml
+
+- name: Build mapnik stylesheet for OSM Carto style
+  include_tasks: build_mapnik_stylesheet.yml
+
+- name: Import OSM Carto additional data
+  include_tasks: import_data.yml
+
+- name: Recreate indexes.sql for concurrent indexing
+  include_tasks: concurrent_indexing.yml
+  when: concurrent_indexing|bool == True

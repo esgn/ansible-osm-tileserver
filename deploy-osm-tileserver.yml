@@ -1,0 +1,56 @@
+---
+
+- name: Prepare instance
+  hosts: osmtileservers
+  roles:
+    - prepare
+
+- name: Install PostgreSQL and PostGIS
+  hosts: osmtileservers
+  roles:
+    - postgis
+
+- name: Install osm2pgsql
+  hosts: osmtileservers
+  roles:
+    - osm2pgsql
+
+- name: Install OpenStreetMapCarto
+  hosts: osmtileservers
+  roles:
+    - openstreetmapcarto
+
+- name: Import OSM data in PostGIS
+  hosts: osmtileservers
+  roles:
+    - import-data
+
+- name: Install renderd + mod_tile and apache2
+  hosts: osmtileservers
+  roles:
+    - mod-tile-renderd
+
+- name: Deploy web page for testing
+  hosts: osmtileservers
+  roles:
+    - webpage
+
+- name: Tune pg for tile production
+  hosts: osmtileservers
+  roles:
+    - tune-pg-for-tiles
+
+- name: generate low level tiles
+  hosts: osmtileservers
+  roles:
+    - generate-low-levels
+
+- name: Continuous database update and tile expire/rerender using osm2pgsql and mod_tile
+  hosts: osmtileservers
+  roles:
+    - update-and-expire
+
+- name: Configuration logrotate for specific log files
+  hosts: osmtileservers
+  roles:
+    - logrotate

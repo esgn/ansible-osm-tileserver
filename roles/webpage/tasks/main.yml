@@ -1,0 +1,8 @@
+---
+
+- name: Get OpenLayers
+  include_tasks: get_ol.yml
+
+- name: Deploy webpage
+  include_tasks: deploy_webpage.yml
+  

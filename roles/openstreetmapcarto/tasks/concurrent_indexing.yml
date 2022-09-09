@@ -1,0 +1,16 @@
+---
+
+
+- name: Remove indexes.sql
+  ansible.builtin.file:
+    path: "{{ osmcarto_dir }}/indexes.sql"
+    state: absent
+  become: true
+  become_user: "{{ renderd_user }}"
+
+- name: Recreate indexes.sql
+  ansible.builtin.shell:
+    cmd: python3 scripts/indexes.py --concurrent > indexes.sql
+    chdir: "{{ osmcarto_dir }}"
+  become: true
+  become_user: "{{ renderd_user }}"

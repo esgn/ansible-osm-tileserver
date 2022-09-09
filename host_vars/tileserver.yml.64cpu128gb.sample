@@ -1,0 +1,178 @@
+---
+
+# Playbook variables for deploying an OSM tileserver
+
+#########################
+# CONNECTION PARAMETERS #
+#########################
+
+# Target IPv4
+ansible_host: 123.456.789.10
+# Username to connect with
+ansible_user: root
+# Alternative configuration if connecting with sudo user instead of root
+# ansible_user: sudo_user
+# ansible_become_password: sudo_password
+# SSH key to connect with
+ansible_ssh_private_key_file: "~/.ssh/opensshkey"
+# Additional args for ssh command line 
+ansible_ssh_common_args: "-o IdentitiesOnly=yes"
+
+#################################
+# POSTGIS SETUP AND DATA IMPORT #
+#################################
+
+# Main options
+# User created by renderd package installation. Do not change
+renderd_user: _renderd
+# database name
+db_name: gis
+# PostgreSQL version
+postgresql_version: 14
+# PostGIS version
+postgis_version: 3
+# OSM pbf file download URL (geofabrik.de, download.openstreetmap.fr and planet.openstreetmap.org are supported)
+osm_pbf_url: "https://download.geofabrik.de/europe/france/bourgogne-latest.osm.pbf"
+# If true flat_nodes option of osm2pgsql will be used to import data
+flat_nodes: True
+# If true concurrent_indexing option of osm2pgsql will be used to import data
+concurrent_indexing: True
+
+# PostgreSQL tuning options for importing OSM data
+# Configuration adapted from https://osm2pgsql.org/doc/manual.html#tuning-the-postgresql-server
+# Lower than typical PostgreSQL recommendations (25% of total RAM) to give osm2pgsql priority to RAM
+import_shared_buffers: 1GB
+# Total RAM * 0.25 / max_connections
+import_work_mem: 50MB
+# Improves CREATE INDEX
+import_maintenance_work_mem: 10GB
+# -1 uses maintenance_work_mem
+import_autovacuum_work_mem: 2GB
+# Reduces WAL activity if replication is not required during data load. Must also set max_wal_senders=0.
+import_wal_level: minimal
+# Increasing this value reduces time-based checkpoints and increases time to restore from PITR
+import_checkpoint_timeout: 60min
+# PostgreSQL > 9.4 only. For PostgreSQL <= 9.4 set checkpoint_segments = 100 or higher
+import_max_wal_size: 16GB
+# Spreads out checkpoint I/O of more of the checkpoint_timeout time, reducing spikes of disk activity
+import_checkpoint_completion_target: 0.9
+# See wal_level
+import_max_wal_senders: 0
+# Assuming fast SSDs
+import_random_page_cost: 1.1
+# "Expert" tuning https://osm2pgsql.org/doc/manual.html#expert-tuning
+import_full_page_writes: off
+import_fsync: off
+# From pgtune
+import_effective_io_concurrency: 200
+import_max_worker_processes: 64
+import_max_parallel_workers_per_gather: 32
+import_max_parallel_workers: 64
+import_max_parallel_maintenance_workers: 4
+import_default_statistics_target: 100
+import_min_wal_size: 4GB
+
+########################
+# SERVER CONFIGURATION #
+########################
+
+# Main options
+# OpenStreetMap Carto style version
+osmcarto_version: 5.6.1
+# Mapnik version
+mapnik_version: 3.1
+# service name
+layer_name: osmcarto
+# service domain
+service_domain : tiles.domain.com
+# max_zoom
+max_zoom: 20
+# openlayers version
+ol_version: 6.15.1
+# Renderd number of threads
+renderd_num_threads: 24
+# Renderd sock path
+renderd_sock_path: /run/renderd/renderd.sock
+# osm2pgsql import num threads
+import_num_threads: 6
+# Meta-tiles report periodicity 
+period: 10
+# PostgreSQL regular cleanup of idle requests periodicity
+pg_cleanup_interval: 30
+# min duration in ms before postgresql logs slow queries
+min_duration: 2500
+
+# PostgreSQL tuning options for OSM tiles production
+tile_max_connections: 250
+tile_shared_buffers: 32GB
+tile_effective_cache_size: 96GB
+tile_maintenance_work_mem: 2GB
+tile_checkpoint_completion_target: 0.9
+tile_wal_buffers: 16MB
+tile_default_statistics_target: 100
+tile_random_page_cost: 1.1
+tile_effective_io_concurrency: 200
+tile_work_mem: 33554kB
+tile_min_wal_size: 2GB
+tile_max_wal_size: 8GB
+tile_max_worker_processes: 64
+tile_max_parallel_workers_per_gather: 4
+tile_max_parallel_workers: 64
+tile_max_parallel_maintenance_workers: 4
+tile_jit: off
+
+############################
+# PRE-RENDERING PARAMETERS #
+############################
+
+# min zoom
+prerender_min_zoom: 0
+# max_zoom
+prerender_max_zoom: 14
+# max_load for prerender
+prerender_max_load: 90
+# num_threads for prerender
+prerender_num_threads: 24
+
+#################################
+# UPDATE AND EXPIRES PARAMETERS #
+#################################
+
+# osm2pgsql_replication threads number
+osm2pgsql_replication_num_threads: 4
+# osm2pgsql_replication cache size
+osm2pgsql_replication_cache_size: 2500
+# osm2pgsql_replication expire range
+osm2pgsql_replication_expire_range: 1-20
+# osm2pgsql_replication max diff size
+osm2pgsql_replication_max_diff_size: 20
+# min zoom expire
+render_expired_min_zoom: 13
+# max_zoom expire
+render_expired_max_zoom: 20
+# touch from zoom level
+render_expired_touch_from: 13
+# delete from zoom level
+render_expired_delete_from: 19
+
+#########################
+# RENDER OLD PARAMETERS #
+#########################
+
+# min zoom render_old
+render_old_min_zoom: 0
+# max_zoom render_old
+render_old_max_zoom: 14
+# render_old threads number
+render_old_num_threads: 20
+# render_old max load
+render_old_max_load: 75
+
+######################
+# APACHE2 PARAMETERS #
+######################
+
+# Apache2 qos : allowed number of requests per second per IP
+requests_per_second: 100
+# Lets encrypt contact email
+letsencrypt_mail: email@somedomain.com

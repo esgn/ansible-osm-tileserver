@@ -1,0 +1,6 @@
+<IfModule mod_qos.c>
+    SetEnvIf                     Request_URI ^/osmcarto/(\d+)/(\d+)/(\d+)\.png$ LimitDownloadCounter
+    SetEnvIf                     Request_URI ^/osmcarto/(\d+)/(\d+)/(\d+)\.png$ QS_Cond=LimitDownloadNow
+    QS_CondClientEventLimitCount {{ requests_per_second }}] 1 LimitDownloadCounter LimitDownloadNow
+    QS_ErrorResponseCode         429
+</IfModule>

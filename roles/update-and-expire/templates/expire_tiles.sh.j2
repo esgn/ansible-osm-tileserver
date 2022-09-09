@@ -1,0 +1,9 @@
+#!/bin/bash
+
+# This script uses the result of update_db (dirty_tiles.txt)
+# and mark metatiles as expired or delete them
+# This script uses the render_expired command from mod_tile
+
+render_expired --map={{ layer_name }} --min-zoom={{ render_expired_min_zoom }} --touch-from={{ render_expired_touch_from }} --delete-from={{ render_expired_delete_from }} --max-zoom={{ render_expired_max_zoom }} --socket={{ renderd_sock_path }} --tile-dir {{ tiles_dir }} < {{ tiles_dir }}/dirty_tiles.txt
+
+rm {{ tiles_dir }}/dirty_tiles.txt

@@ -1,0 +1,15 @@
+---
+
+- name: Remove PostgreSQL import tuning
+  community.postgresql.postgresql_set:
+    name: "{{ item.name }}"
+    value: "{{ item.prev_val_pretty }}"
+  become: true
+  become_user: postgres
+  loop: "{{ update.results }}"
+
+- name: Restart PostgreSQL
+  ansible.builtin.service: 
+    name: postgresql
+    state: restarted
+  become: true

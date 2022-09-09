@@ -1,0 +1,27 @@
+---
+
+- name: Install necessary packages
+  ansible.builtin.apt:
+    pkg:
+    - python3-psycopg2
+  become: true
+
+- name: Add an Apt signing key, uses whichever key is at the URL
+  ansible.builtin.apt_key:
+    url: https://www.postgresql.org/media/keys/ACCC4CF8.asc
+    state: present
+  become: true
+
+- name: add postgresql apt repository
+  ansible.builtin.apt_repository:
+    repo: "deb http://apt.postgresql.org/pub/repos/apt {{ ansible_distribution_release }}-pgdg main"
+    state: present
+  become: true
+
+- name: Install postgis packages
+  ansible.builtin.apt:
+    update_cache: yes
+    pkg:
+    - postgresql-{{ postgresql_version }}-postgis-{{ postgis_version }}
+    - postgis
+  become: true

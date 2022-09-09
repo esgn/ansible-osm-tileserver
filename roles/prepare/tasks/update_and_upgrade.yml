@@ -1,0 +1,14 @@
+---
+
+- name: Activate backports packages
+  ansible.builtin.lineinfile:
+    line: "deb http://deb.debian.org/debian {{ ansible_distribution_release }}-backports main contrib non-free"
+    destfile: /etc/apt/sources.list
+  become: true
+
+- name: Upgrade all packages
+  ansible.builtin.apt:
+    force_apt_get: true
+    upgrade: dist
+    update-cache: true
+  become: true

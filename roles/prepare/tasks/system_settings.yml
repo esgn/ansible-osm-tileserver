@@ -1,0 +1,7 @@
+---
+
+- name: Set vm.swappiness
+  ansible.posix.sysctl:
+    name: vm.swappiness
+    value: '10'
+    state: present

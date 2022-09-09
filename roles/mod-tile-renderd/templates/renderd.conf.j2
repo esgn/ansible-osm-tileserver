@@ -1,0 +1,20 @@
+# ansible managed
+
+[renderd]
+socketname=/var/run/renderd/renderd.sock
+num_threads={{ renderd_num_threads }}
+tile_dir={{ tiles_dir }}
+stats_file=/var/run/renderd/renderd.stats
+
+[mapnik]
+plugins_dir=/usr/lib/mapnik/{{ mapnik_version }}/input
+font_dir={{ osmcarto_dir }}/fonts
+font_dir_recurse=false
+
+[{{ layer_name }}]
+URI=/{{ layer_name }}/
+XML={{ osmcarto_dir }}/style.xml
+HOST={{ service_domain }}
+MINZOOM=0
+MAXZOOM={{ max_zoom }}
+CORS=*

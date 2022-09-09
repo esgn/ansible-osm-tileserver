@@ -1,0 +1,15 @@
+---
+
+- name: Import external data
+  ansible.builtin.shell:
+    cmd: python3 scripts/get-external-data.py 2> {{ setup_logs_dir }}/get-external-data.log
+    chdir: "{{ osmcarto_dir }}"
+  become: true
+  become_user: "{{ renderd_user }}"
+
+- name: Import fonts
+  ansible.builtin.shell:
+    cmd: bash scripts/get-fonts.sh 2> {{ setup_logs_dir }}/get-fonts.log
+    chdir: "{{ osmcarto_dir }}"
+  become: true
+  become_user: "{{ renderd_user }}"

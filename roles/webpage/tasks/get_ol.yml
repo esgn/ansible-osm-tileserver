@@ -1,0 +1,9 @@
+---
+
+- name: Download and unzip OpenLayers distribution
+  ansible.builtin.unarchive:
+    src: https://github.com/openlayers/openlayers/releases/download/v{{ ol_version }}/v{{ ol_version }}-dist.zip
+    dest: "{{ html_dir }}"
+    remote_src: yes
+  become: true
+  become_user: "{{ renderd_user }}"

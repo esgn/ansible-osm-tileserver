@@ -1,0 +1,8 @@
+---
+
+- name: Install necessary packages
+  ansible.builtin.apt:
+    pkg:
+    - python3-psycopg2
+    - python3-pyosmium
+  become: true

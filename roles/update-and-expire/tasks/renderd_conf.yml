@@ -1,0 +1,26 @@
+---
+
+- name: Delete update lock file on renderd restart
+  ansible.builtin.lineinfile:
+    dest: "/usr/lib/systemd/system/renderd.service"
+    insertafter: '\[Service\]'
+    line: "ExecStartPre=rm -f {{ update_lock_file }}"
+  become: true
+
+- name: Delete render_old lock file on renderd restart
+  ansible.builtin.lineinfile:
+    dest: "/usr/lib/systemd/system/renderd.service"
+    insertafter: '\[Service\]'
+    line: "ExecStartPre=rm -f {{ render_old_lock_file }}"
+  become: true   
+
+- name: Daemon reload
+  ansible.builtin.systemd:
+    daemon_reload: true
+  become: true
+
+- name: Restart renderd
+  ansible.builtin.service:
+    name: renderd
+    state: restarted
+  become: true

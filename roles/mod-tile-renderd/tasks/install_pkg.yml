@@ -1,0 +1,10 @@
+---
+
+- name: Install necessary packages
+  ansible.builtin.apt:
+    pkg:
+    - libapache2-mod-tile 
+    - libapache2-mod-qos
+    - apache2
+    - certbot
+  become: true

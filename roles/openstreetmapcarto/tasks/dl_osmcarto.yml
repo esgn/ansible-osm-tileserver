@@ -1,0 +1,22 @@
+---
+
+- name: Download and unzip OpenStreetMapCarto style
+  ansible.builtin.unarchive:
+    src: https://github.com/gravitystorm/openstreetmap-carto/archive/refs/tags/v{{ osmcarto_version }}.zip
+    dest: "{{ styles_dir }}"
+    remote_src: yes
+  become: true
+  become_user: "{{ renderd_user }}"
+
+- name: set fact for osmcarto base dir
+  ansible.builtin.set_fact:
+    osmcarto_dir: "{{ styles_dir }}/openstreetmap-carto-{{ osmcarto_version }}"
+
+- name: Use the german mirror of osdn.net to speed things up
+  ansible.builtin.replace:
+    path: "{{ osmcarto_dir }}/scripts/get-fonts.sh"
+    regexp: 'redir\.php\?'
+    replace: 'redir.php?m=rwthaachen&'
+    backup: true
+  become: true
+  become_user: "{{ renderd_user }}"

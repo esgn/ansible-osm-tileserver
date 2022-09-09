@@ -1,0 +1,20 @@
+---
+
+# In case advanced debugging is required
+- name: add to ansible hosts file
+  ansible.builtin.lineinfile:
+    dest: "/usr/lib/systemd/system/renderd.service"
+    insertafter: '\[Service\]'
+    line: "Environment=G_MESSAGES_DEBUG=all"
+  become: true
+
+# Redirects renderd logs to a separate file
+# Sets to warning by default. Change it to get debug messages
+- name: Copy renderd.conf for rsyslog
+  ansible.builtin.template:
+    src: templates/99-renderd.conf.j2
+    dest: /etc/rsyslog.d/99-renderd.conf
+    owner: root
+    group: root
+    mode: '0644'
+  become: true

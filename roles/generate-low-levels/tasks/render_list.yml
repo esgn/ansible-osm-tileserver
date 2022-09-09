@@ -1,0 +1,8 @@
+---
+
+- name: Render tiles with render_list
+  ansible.builtin.shell:
+    cmd: sudo -u {{ renderd_user }} render_list --all --num-threads={{ prerender_num_threads }} --max-load={{ prerender_max_load }} --map={{ layer_name }} --min-zoom={{ prerender_min_zoom }} --max-zoom={{ prerender_max_zoom }} --socket={{ renderd_sock_path }} --tile-dir={{ tiles_dir }} 2>&1 | sudo -u {{ renderd_user }} tee {{ setup_logs_dir }}/render_list_{{ prerender_min_zoom }}_{{ prerender_max_zoom }}.log
+  async: 86400
+  poll: 60
+  become: true

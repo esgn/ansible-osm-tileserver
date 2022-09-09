@@ -1,0 +1,13 @@
+---
+
+- name: Update and upgrade packages before doing anything
+  include_tasks: update_and_upgrade.yml
+
+- name: Install necessary packages
+  include_tasks: install_packages.yml
+
+- name: Create necessary directories
+  include_tasks: create_dirs.yml
+
+- name: Kernel and system adjustments
+  include_tasks: system_settings.yml

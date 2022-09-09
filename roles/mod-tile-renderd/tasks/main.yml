@@ -1,0 +1,48 @@
+---
+
+- name: Install necessary packages
+  include_tasks: install_pkg.yml
+
+- name: Activate apache modules
+  include_tasks: apache_modules.yml
+
+- name: Deploy configuration and activate it
+  include_tasks: deploy_conf.yml
+
+- name: Log renderd out of syslog
+  include_tasks: renderd_log.yml
+
+- name: Daemon reload
+  ansible.builtin.systemd:
+    daemon_reload: true
+  become: true   
+  
+- name: Restart rsyslog
+  ansible.builtin.service:
+    name: rsyslog
+    state: restarted
+  become: true
+
+- name: Restart renderd
+  ansible.builtin.service:
+    name: renderd
+    state: restarted
+  become: true
+
+- name: Restart apache2
+  ansible.builtin.service:
+    name: apache2
+    state: restarted
+  become: true
+
+- name: Set up letsencrypt certificate and HTTPS
+  include_tasks: https.yml
+
+- name: Restart apache2
+  ansible.builtin.service:
+    name: apache2
+    state: restarted
+  become: true
+
+- name: Set crontab rule for certificate renewal
+  include_tasks: cron.yml

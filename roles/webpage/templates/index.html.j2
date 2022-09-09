@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>OSM Tile Server playground</title>
+    <link rel="stylesheet" href="/v{{ ol_version }}-dist/ol.css" type="text/css">
+    <script src="/v{{ ol_version }}-dist/ol.js"></script>
+    <style>
+        @import url(https://fonts.googleapis.com/css?family=Quattrocento+Sans:400,400italic,700);
+        html,
+        body {
+            font-family: 'Quattrocento Sans', sans-serif;
+            font-size: 16px;
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        .zoom-level-info {
+            top: 65px;
+            left: .5em;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map" class="map" tabindex="0" style="width:100%; height:100%;"></div>
+    <script>
+        var map = new ol.Map({
+            layers: [
+                new ol.layer.Tile({
+                    source: new ol.source.OSM({
+                        url: '/{{ layer_name }}/{z}/{x}/{y}.png',
+                        maxZoom: 20
+                    })
+                })
+            ],
+            target: 'map',
+            view: new ol.View({
+                center: [244780.24508882355, 7386452.183179816],
+                zoom: 5,
+                constrainResolution: true,
+                minZoom: 0,
+                maxZoom: 20
+            })
+        });
+        var button = document.createElement('button');
+        button.id = 'zoom-info';
+        button.innerHTML = '0';
+        button.disabled = true;
+        var element = document.createElement('div');
+        element.appendChild(button);
+        element.className = 'zoom-level-info ol-unselectable ol-control';	
+        var ZoomLevelInfo = new ol.control.Control({
+                element: element
+        });
+        map.addControl(ZoomLevelInfo);
+        map.on('moveend', function(e) {
+            var zoomInfo = map.getView().getZoom();
+                    console.log(zoomInfo);
+            document.getElementById('zoom-info').innerHTML = zoomInfo;
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,41 @@
+---
+
+- name: Set base_dir
+  ansible.builtin.set_fact:
+    base_dir: "/srv/{{ service_domain }}"
+
+- name: Set other dirs
+  ansible.builtin.set_fact:
+    tiles_dir: "{{ base_dir }}/tiles"
+    html_dir: "{{ base_dir }}/html"
+    styles_dir: "{{ base_dir }}/styles"
+    osmdata_dir: "{{ base_dir }}/osmdata"
+    logs_dir: "{{ base_dir }}/logs"
+    scripts_dir: "{{ base_dir }}/scripts"
+
+- name: Set specific logs dirs
+  ansible.builtin.set_fact:
+    setup_logs_dir: "{{ logs_dir }}/setup"
+    update_logs_dir: "{{ logs_dir }}/update-expire"
+    update_lock_file: "{{ tiles_dir }}/update_db.sh.running"
+    render_old_logs_dir: "{{ logs_dir }}/render-old"
+    render_old_lock_file: "{{ tiles_dir }}/render_old.sh.running"
+
+- name: Create directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ renderd_user }}"
+    group: "{{ renderd_user }}"
+  loop:
+   - "{{ base_dir }}"
+   - "{{ tiles_dir }}"
+   - "{{ html_dir }}"
+   - "{{ styles_dir }}"
+   - "{{ osmdata_dir }}"
+   - "{{ logs_dir }}"
+   - "{{ scripts_dir }}"
+   - "{{ setup_logs_dir }}"
+   - "{{ update_logs_dir }}"
+   - "{{ render_old_logs_dir }}"
+  become: true

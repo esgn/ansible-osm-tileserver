@@ -1,0 +1,41 @@
+---
+
+# TODO: Auto compute parameter values based on server facts
+- name: Tune PostgreSQL for OSM data import
+  community.postgresql.postgresql_set:
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+  register: update
+  become: true
+  become_user: postgres
+  loop:
+    - { name: 'shared_buffers', value: "{{ import_shared_buffers }}" }
+    - { name: 'work_mem', value: "{{ import_work_mem }}" }
+    - { name: 'maintenance_work_mem', value: "{{ import_maintenance_work_mem }}" }
+    - { name: 'autovacuum_work_mem', value: "{{ import_autovacuum_work_mem }}" }
+    - { name: 'wal_level', value: "{{ import_wal_level }}" }
+    - { name: 'checkpoint_timeout', value: "{{ import_checkpoint_timeout }}" }
+    - { name: 'max_wal_size', value: "{{ import_max_wal_size }}" }
+    - { name: 'checkpoint_completion_target', value: "{{ import_checkpoint_completion_target }}" }
+    - { name: 'max_wal_senders', value: "{{ import_max_wal_senders }}" }
+    - { name: 'random_page_cost', value: "{{ import_random_page_cost }}" }
+    - { name: 'effective_io_concurrency', value: "{{ import_effective_io_concurrency }}" }
+    - { name: 'max_worker_processes', value: "{{ import_max_worker_processes }}" }
+    - { name: 'max_parallel_workers_per_gather', value: "{{ import_max_parallel_workers_per_gather }}" }
+    - { name: 'max_parallel_workers', value: "{{ import_max_parallel_workers }}" }
+    - { name: 'max_parallel_maintenance_workers', value: "{{ import_max_parallel_maintenance_workers }}" }
+    - { name: 'default_statistics_target', value: "{{ import_default_statistics_target }}" }
+    - { name: 'min_wal_size', value: "{{ import_min_wal_size }}" }
+    - { name: 'full_page_writes', value: "{{ import_full_page_writes }}" }
+    - { name: 'fsync', value: "{{ import_fsync }}" }
+
+- name: Print the result if the setting changed
+  ansible.builtin.debug:
+    msg: "{{ item.name }} {{ item.prev_val_pretty }} >> {{ item.value_pretty }} restart_req: {{ item.restart_required }}"
+  loop: "{{ update.results }}"
+
+- name: Restart PostgreSQL
+  ansible.builtin.service: 
+    name: postgresql
+    state: restarted
+  become: true

@@ -1,0 +1,52 @@
+#!/bin/bash
+
+# This script uses osm2pgsql_replication to update the OSM database
+# and produce the list of tiles that must be expires (dirty_tiles.txt)
+# osm2pgsql_replication directly calls expire_tiles via --post-processing
+# to mark dirty metatiles as expired (mtime set to 20 years ago)
+
+echo
+echo "update_db.sh run:" `date`
+
+# Checks if osm2pgsql-replication is available
+if ! command -v osm2pgsql-replication &> /dev/null
+then
+    echo "osm2pgsql-replication could not be found"
+    exit 1
+fi
+
+# Checks if render_old is already running
+# Might not be necessary but seems like a reasonable idea
+if [[ -f {{ render_old_lock_file }} ]]
+then
+    echo "render_old.sh is running. Exiting."
+    exit 1
+fi
+
+# Checks if this script is already running
+if [[ -f {{ update_lock_file }} ]]
+then
+    echo "update_tiles.sh already running; {{ update_lock_file }} exists"
+    exit 1
+else
+    touch {{ update_lock_file }}
+fi
+
+# Updates database and generates a list of dirty tiles for expire_tiles.sh.j2
+# Yes there is a '--' floating in the middle of the command. It separates
+# osm2pgsql-replication parameters from osm2pgsql parameters
+{% if flat_nodes %}
+if ! osm2pgsql-replication update -d {{ db_name }} --post-processing {{ scripts_dir }}/expire_tiles.sh --max-diff-size {{ osm2pgsql_replication_max_diff_size }}  -- --multi-geometry --tag-transform-script {{ transform_script }} -C {{ osm2pgsql_replication_cache_size }} --number-processes {{ osm2pgsql_replication_num_threads }} --flat-nodes={{osmdata_dir}}/flat_nodes -S {{ style_file }} --expire-tiles={{ osm2pgsql_replication_expire_range }} --expire-output={{ tiles_dir }}/dirty_tiles.txt > {{ update_logs_dir }}/osm2pgsql-replication.$$ 2>&1
+{% else %}
+if ! osm2pgsql-replication update -d {{ db_name }} --post-processing {{ scripts_dir }}/expire_tiles.sh --max-diff-size {{ osm2pgsql_replication_max_diff_size }}  -- --multi-geometry --tag-transform-script {{ transform_script }} -C {{ osm2pgsql_replication_cache_size }} --number-processes {{ osm2pgsql_replication_num_threads }} -S {{ style_file }} --expire-tiles={{ osm2pgsql_replication_expire_range }} --expire-output={{ tiles_dir }}/dirty_tiles.txt > {{ update_logs_dir }}/osm2pgsql-replication.$$ 2>&1
+{% endif %}
+then
+    echo "osm2pgsql-replication error"
+    cat {{ update_logs_dir }}/osm2pgsql-replication.$$
+else
+    grep Backlog {{ update_logs_dir }}/osm2pgsql-replication.$$ | tail -1
+    # rm {{ update_logs_dir }}/osm2pgsql-replication.$$
+fi
+
+# Deletes the process lock file
+rm {{ update_lock_file }}

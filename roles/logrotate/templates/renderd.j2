@@ -1,0 +1,17 @@
+{{ logs_dir }}/renderd.log {
+  # rotate log file daily
+  daily
+  # Log file is rotated only if it grow bigger than 1G.
+  size 1G
+  # Log files is rotated count times before being removed.
+  rotate 7
+  # Old versions of log file are compressed with gzip
+  compress
+  # Postpone compression of the previous log file to the next rotation cycle.
+  delaycompress
+  # Do not rotate the log if it is empty
+  notifempty
+  # permission of rotated log file
+  create 640 {{ renderd_user }} {{ renderd_user }}
+  endscript
+}

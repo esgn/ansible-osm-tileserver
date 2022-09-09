@@ -1,0 +1,20 @@
+---
+
+- name: Tune PostgreSQL for import
+  include_tasks: pg_tuning.yml
+
+- name: Download OSM pbf dataset
+  include_tasks: dl_osm_pbf.yml
+
+- name: Import data using osm2pgsql
+  include_tasks: import_pbf.yml
+
+- name: Create indexes
+  include_tasks: create_idx.yml
+
+- name: Remove PostgreSQL tuning options
+  include_tasks: remove_pg_tuning.yml
+
+- name: Create planet-import-complete file for mod_tile 
+  include_tasks: planet_import_complete.yml
+  

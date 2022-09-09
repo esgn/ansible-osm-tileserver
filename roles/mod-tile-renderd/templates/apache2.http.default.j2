@@ -1,0 +1,51 @@
+<VirtualHost *:80>
+
+    # Basic server configuration
+    ServerName {{ service_domain }}
+    ServerAdmin webmaster@{{ service_domain }}
+
+    # Setup logging
+    LogLevel warn
+    LogFormat "%a %l %u %t \"%r\" %>s %O \"%{Referer}i\" \"%{User-Agent}i\"" combined_with_remoteip
+    CustomLog /var/log/apache2/http-access.log combined_with_remoteip
+    ErrorLog /var/log/apache2/http-error.log
+    BufferedLogs on
+
+    # Always set Access-Control-Allow-Origin so that simple CORS requests
+    # will always work and can be cached
+    Header set Access-Control-Allow-Origin "*"
+
+    # Remove Proxy request header to mitigate https://httpoxy.org/
+    RequestHeader unset Proxy early
+
+    # Enable the rewrite engine
+    RewriteEngine on
+
+    # Configure location of static files and CGI scripts
+    DocumentRoot {{ html_dir }}
+
+    # Tell clients to use stale tiles if necessary
+    # https://www.fastly.com/blog/stale-while-revalidate-stale-if-error-available-today
+    Header append Cache-Control "stale-while-revalidate=604800, stale-if-error=604800" "expr=%{CONTENT_TYPE} == 'image/png'"
+
+    # Redirect to https
+    ## RewriteCond %{REQUEST_URI} !^/mod_tile$
+    ## RewriteRule (.*) https://%{SERVER_NAME}$1 [R=permanent,L]
+
+    <Directory {{ html_dir }}>
+        Options None
+        AllowOverride None
+        Require all granted
+    </Directory>
+    
+    # Referer filtering
+    <Location /{{ layer_name }}>
+        SetEnvIf Referer {{ service_domain }} trusted_referer
+        Order deny,allow
+        Deny from all
+        Allow from env=trusted_referer
+    </Location>
+
+</VirtualHost>
+
+

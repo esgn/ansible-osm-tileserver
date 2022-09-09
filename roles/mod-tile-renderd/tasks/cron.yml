@@ -1,0 +1,10 @@
+---
+
+- name: Set up CRON rule for letsencrypt renewal
+  ansible.builtin.cron:
+    name: "Renew letsencrypt certificate and restart apache at 2AM on Tuesday"
+    minute: "0"
+    hour: "1"
+    day: "2"
+    job: "certbot certonly --force-renewal --webroot -w {{ html_dir }} -d {{ service_domain }} && service apache2 reload"
+  become: true

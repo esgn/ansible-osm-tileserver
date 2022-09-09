@@ -1,0 +1,23 @@
+---
+
+- name: Run update job every 5 minutes
+  ansible.builtin.cron:
+    name: "update database and expire metatiles"
+    minute: "*/5"
+    job: "sudo -u _renderd {{ scripts_dir }}/update_db.sh"
+  become: true
+
+- name: Run render expired job during the night
+  ansible.builtin.cron:
+    name: "rerender expired metatiles"
+    hour: "2"
+    minute: "0"
+    job: "sudo -u _renderd {{ scripts_dir }}/render_old.sh"
+  become: true
+
+- name: Generate metatilecount every 10 minutes
+  ansible.builtin.cron:
+    name: "generate simple report about metatiles cache status"
+    minute: "*/{{ period }}"
+    job: "sudo -u _renderd {{ scripts_dir }}/periodic_report.sh "
+  become: true

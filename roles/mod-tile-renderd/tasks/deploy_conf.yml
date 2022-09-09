@@ -1,0 +1,55 @@
+---
+
+- name: Disable all apache virtualhost
+  ansible.builtin.shell:
+    cmd: a2dissite *
+  become: true
+
+- name: Locating all files in /etc/apache2/sites-available/
+  find:
+    path: "/etc/apache2/sites-available/"
+  register: cleanup
+  ignore_errors: true
+  become: true
+
+- name: Removing all files previously found /etc/apache2/sites-available/
+  file:
+    path: "{{ item.path }}"
+    state: absent
+  with_items: "{{ cleanup.files }}"
+  ignore_errors: true
+  become: true
+
+- name: Deploy configuration files
+  ansible.builtin.template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: root
+    group: root
+    mode: '0644'
+  loop:
+    - { src: "templates/renderd.conf.j2", dest: "/etc/renderd.conf" }
+    - { src: "templates/apache2.renderd.conf.j2", dest: "/etc/apache2/conf-available/renderd.conf" }
+    - { src: "templates/qos.conf.j2", dest: "/etc/apache2/conf-available/qos.conf" }
+    - { src: "templates/apache2.http.default.j2", dest: "/etc/apache2/sites-available/http.conf" }
+    - { src: "templates/apache2.https.default.j2", dest: "/etc/apache2/sites-available/https.conf" }
+  become: true
+
+- name: Activate http site
+  ansible.builtin.shell:
+    cmd: a2ensite http
+  become: true
+  
+- name: Activate apache2 modules
+  ansible.builtin.command:
+    cmd: a2enconf {{ item }}
+  loop:
+    - renderd
+    - qos
+  become: true
+
+- name: Restart apache2
+  ansible.builtin.service:
+    name: apache2
+    state: restarted
+  become: true
