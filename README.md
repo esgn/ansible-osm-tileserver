@@ -2,9 +2,10 @@
 
 Sample playbook to install and deploy an OSM tile server on a single Debian 11 instance.
 
-The current version uses the following software :
+The current version uses the following projects :
 * [oms2pgsql](https://osm2pgsql.org/) and [osm2pgsql-replication](https://osm2pgsql.org/doc/manual.html#keeping-the-database-up-to-date-with-osm2pgsql-replication)
 * [mod_tile](https://github.com/openstreetmap/mod_tile)
+* [openstreetmap-carto](https://github.com/gravitystorm/openstreetmap-carto)
 
 Other versions using [imposm](https://imposm.org/), [pyosmium](https://osmcode.org/pyosmium/) or [tirex](https://wiki.openstreetmap.org/wiki/Tirex) are possible but yet to be implemented. [osmosis](https://github.com/openstreetmap/osmosis) only solution appears to be superseded by `osm2psql-replication`.
 
