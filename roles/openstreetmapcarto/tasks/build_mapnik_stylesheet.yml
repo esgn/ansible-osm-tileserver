@@ -3,24 +3,23 @@
 - name: Install standard packages
   ansible.builtin.apt:
     pkg:
-    - python3-psycopg2
-    - python3-yaml
-    - python3-requests
-    - nodejs
-    - npm
-    - curl
-    - gdal-bin
-    - mapnik-utils
-    # - libmapnik-dev
+      - python3-psycopg2
+      - python3-yaml
+      - python3-requests
+      - nodejs
+      - npm
+      - curl
+      - gdal-bin
+      - mapnik-utils
   become: true
 
 - name: Install carto CSS using npm
   community.general.npm:
     name: carto
-    global: yes
+    global: true
     state: present
   become: true
-  
+
 # Warning at this stage are considered non-issue for the time being
 # https://github.com/gravitystorm/openstreetmap-carto/issues/3717
 # https://github.com/gravitystorm/openstreetmap-carto/issues/3183

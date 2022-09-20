@@ -23,12 +23,12 @@
 - name: Import OSM data in PostGIS
   hosts: osmtileservers
   roles:
-    - import-data
+    - import_data
 
 - name: Install renderd + mod_tile and apache2
   hosts: osmtileservers
   roles:
-    - mod-tile-renderd
+    - mod_tile_renderd
 
 - name: Deploy web page for testing
   hosts: osmtileservers
@@ -38,17 +38,17 @@
 - name: Tune pg for tile production
   hosts: osmtileservers
   roles:
-    - tune-pg-for-tiles
+    - tune_pg_for_tiles
 
 - name: generate low level tiles
   hosts: osmtileservers
   roles:
-    - generate-low-levels
+    - generate_low_levels
 
 - name: Continuous database update and tile expire/rerender using osm2pgsql and mod_tile
   hosts: osmtileservers
   roles:
-    - update-and-expire
+    - update_and_expire
 
 - name: Configuration logrotate for specific log files
   hosts: osmtileservers

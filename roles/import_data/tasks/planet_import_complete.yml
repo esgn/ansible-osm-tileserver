@@ -1,7 +1,7 @@
 ---
 
 # This file is used by mod_tile to determine if a tile is expired
-# We are going to use a strategy where 
+# We are going to use a strategy where
 # * tiles expired by expire_tiles.sh will be rerendered by mod_tile (mtime 20 years ago)
 # * Other tiles wont be rerendered unless they are more than one year old
 - name: Create planet_import_complete.yml file a year in the past.

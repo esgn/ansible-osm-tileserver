@@ -11,4 +11,4 @@
 
 - name: Recreate indexes.sql for concurrent indexing
   include_tasks: concurrent_indexing.yml
-  when: concurrent_indexing|bool == True
+  when: concurrent_indexing

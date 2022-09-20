@@ -16,7 +16,7 @@
 
 - name: Adds postgis and hstore extensions to the database "{{ db_name }}"
   community.postgresql.postgresql_ext:
-    name: "{{ item }}" 
+    name: "{{ item }}"
     db: "{{ db_name }}"
   become: true
   become_user: postgres

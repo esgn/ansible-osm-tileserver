@@ -27,15 +27,16 @@
     state: directory
     owner: "{{ renderd_user }}"
     group: "{{ renderd_user }}"
+    mode: '0755'
   loop:
-   - "{{ base_dir }}"
-   - "{{ tiles_dir }}"
-   - "{{ html_dir }}"
-   - "{{ styles_dir }}"
-   - "{{ osmdata_dir }}"
-   - "{{ logs_dir }}"
-   - "{{ scripts_dir }}"
-   - "{{ setup_logs_dir }}"
-   - "{{ update_logs_dir }}"
-   - "{{ render_old_logs_dir }}"
+    - "{{ base_dir }}"
+    - "{{ tiles_dir }}"
+    - "{{ html_dir }}"
+    - "{{ styles_dir }}"
+    - "{{ osmdata_dir }}"
+    - "{{ logs_dir }}"
+    - "{{ scripts_dir }}"
+    - "{{ setup_logs_dir }}"
+    - "{{ update_logs_dir }}"
+    - "{{ render_old_logs_dir }}"
   become: true

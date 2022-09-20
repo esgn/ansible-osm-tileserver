@@ -5,4 +5,3 @@
 
 - name: Deploy webpage
   include_tasks: deploy_webpage.yml
-  

@@ -47,7 +47,7 @@ _Note: Some packages are already installed from backports. Check https://blends.
 Run playbook with the following command:
 
 ```
-(ansiblevenv) ansible-playbook -i hosts deploy-osm-tileserver.yml
+(ansiblevenv) ansible-playbook -i hosts deploy_osm_tileserver.yml
 ```
 
 If the playbook succesfully executed, you'll be able to access the demo page for your instance at `https://[service_domain]`. Map tiles are requested from `https://[service_domain]/[layer_domain]/{z}/{x}/{y}.png`

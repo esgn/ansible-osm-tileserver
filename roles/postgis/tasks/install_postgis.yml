@@ -3,7 +3,7 @@
 - name: Install necessary packages
   ansible.builtin.apt:
     pkg:
-    - python3-psycopg2
+      - python3-psycopg2
   become: true
 
 - name: Add an Apt signing key, uses whichever key is at the URL
@@ -20,8 +20,8 @@
 
 - name: Install postgis packages
   ansible.builtin.apt:
-    update_cache: yes
+    update_cache: true
     pkg:
-    - postgresql-{{ postgresql_version }}-postgis-{{ postgis_version }}
-    - postgis
+      - postgresql-{{ postgresql_version }}-postgis-{{ postgis_version }}
+      - postgis
   become: true

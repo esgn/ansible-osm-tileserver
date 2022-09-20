@@ -17,4 +17,3 @@
 
 - name: Create planet-import-complete file for mod_tile 
   include_tasks: planet_import_complete.yml
-  

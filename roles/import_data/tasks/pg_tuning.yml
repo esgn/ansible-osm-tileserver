@@ -35,7 +35,7 @@
   loop: "{{ update.results }}"
 
 - name: Restart PostgreSQL
-  ansible.builtin.service: 
+  ansible.builtin.service:
     name: postgresql
     state: restarted
   become: true

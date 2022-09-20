@@ -39,7 +39,7 @@
   ansible.builtin.shell:
     cmd: a2ensite http
   become: true
-  
+
 - name: Activate apache2 modules
   ansible.builtin.command:
     cmd: a2enconf {{ item }}

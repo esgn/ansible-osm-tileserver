@@ -15,7 +15,7 @@
   poll: 60
   register: cmd_result
   become: true
-  when: flat_nodes|bool == False
+  when: not flat_nodes
 
 - name: Launch import as asynchronous task with flat nodes
   ansible.builtin.shell:
@@ -24,9 +24,8 @@
   poll: 60
   register: cmd_result
   become: true
-  when: flat_nodes|bool == True
+  when: flat_nodes
 
 - name: Print import command result
   debug:
     msg: "{{ cmd_result }}"
-  
