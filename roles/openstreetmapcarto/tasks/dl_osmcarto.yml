@@ -8,7 +8,7 @@
   become: true
   become_user: "{{ renderd_user }}"
 
-- name: set fact for osmcarto base dir
+- name: Set fact for osmcarto base dir
   ansible.builtin.set_fact:
     osmcarto_dir: "{{ styles_dir }}/openstreetmap-carto-{{ osmcarto_version }}"
 

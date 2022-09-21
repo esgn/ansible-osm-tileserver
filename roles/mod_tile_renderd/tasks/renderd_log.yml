@@ -1,7 +1,7 @@
 ---
 
 # In case advanced debugging is required
-- name: add to ansible hosts file
+- name: Add debug all in renderd service definition
   ansible.builtin.lineinfile:
     dest: "/usr/lib/systemd/system/renderd.service"
     insertafter: '\[Service\]'

@@ -12,7 +12,7 @@
     state: present
   become: true
 
-- name: add postgresql apt repository
+- name: Add postgresql apt repository
   ansible.builtin.apt_repository:
     repo: "deb http://apt.postgresql.org/pub/repos/apt {{ ansible_distribution_release }}-pgdg main"
     state: present
