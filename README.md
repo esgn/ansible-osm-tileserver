@@ -23,10 +23,7 @@ sudo apt install python3-venv
 Execute the following commands to create a virtualenv and install the necessary libs in it :
 
 ```
-mkdir venv
-cd venv
-python3 -m venv ansiblevenv
-cd ..
+python3 -m venv venv/ansiblevenv
 source venv/ansiblevenv/bin/activate
 (ansiblevenv) python3 -m pip install ansible
 (ansiblevenv) ansible-galaxy collection install -r requirements.yml
